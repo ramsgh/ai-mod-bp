@@ -7,26 +7,33 @@ import uuid
 
 
 def to_embedding_request(raw_event: str) -> str:
-    event = json.loads(raw_event)
-    payload = event.get("payload", event)
-    document = {
-        "embedding_request_id": str(uuid.uuid4()),
-        "source_event_id": payload.get("event_id"),
-        "source_system": payload.get("source_system", "erp"),
-        "entity_type": "purchase_order",
-        "entity_id": payload.get("purchase_order_id"),
-        "text": (
-            f"Purchase order {payload.get('purchase_order_id')} for supplier "
-            f"{payload.get('supplier_id')} is {payload.get('status')} with amount "
-            f"{payload.get('amount')} {payload.get('currency')}."
-        ),
-        "metadata": {
-            "domain": "procurement",
-            "classification": "internal",
-            "event_time": payload.get("event_time")
+    try:
+        event = json.loads(raw_event)
+        payload = event.get("payload", event)
+        document = {
+            "embedding_request_id": str(uuid.uuid4()),
+            "source_event_id": payload.get("event_id"),
+            "source_system": payload.get("source_system", "erp"),
+            "entity_type": "purchase_order",
+            "entity_id": payload.get("purchase_order_id"),
+            "text": (
+                f"Purchase order {payload.get('purchase_order_id')} for supplier "
+                f"{payload.get('supplier_id')} is {payload.get('status')} with amount "
+                f"{payload.get('amount')} {payload.get('currency')}."
+            ),
+            "metadata": {
+                "domain": "procurement",
+                "classification": "internal",
+                "event_time": payload.get("event_time")
+            }
         }
-    }
-    return json.dumps(document)
+        return json.dumps(document)
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON: {e} for event: {raw_event}")
+        return "" # Return an empty string for malformed JSON
+    except Exception as e:
+        print(f"An unexpected error occurred: {e} for event: {raw_event}")
+        return ""
 
 
 def main() -> None:
@@ -53,6 +60,7 @@ def main() -> None:
 
     env.from_source(source, WatermarkStrategy.no_watermarks(), "purchase-order-source") \
         .map(to_embedding_request) \
+        .filter(lambda x: x != "") \
         .sink_to(sink)
 
     env.execute("ai-modernization-enrichment")
