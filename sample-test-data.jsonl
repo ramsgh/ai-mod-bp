@@ -1,0 +1,30 @@
+{
+  "event_id": "evt-001",
+  "event_time": "2026-06-12T09:00:00Z",
+  "purchase_order_id": "PO-10001",
+  "supplier_id": "SUP-445",
+  "status": "APPROVED",
+  "amount": "125000.00",
+  "currency": "USD",
+  "source_system": "legacy-erp"
+}
+{
+  "event_id": "evt-002",
+  "event_time": "2026-06-13T10:30:00Z",
+  "purchase_order_id": "PO-10002",
+  "supplier_id": "SUP-789",
+  "status": "CANCELLED",
+  "amount": "250000.00",
+  "currency": "USD",
+  "source_system": "legacy-erp"
+}
+{
+  "event_id": "evt-003",
+  "event_time": "2026-06-14T11:15:00Z",
+  "purchase_order_id": "PO-10003",
+  "supplier_id": "SUP-123",
+  "status": "APPROVED",
+  "amount": "75000.00",
+  "currency": "USD",
+  "source_system": "legacy-erp"
+}
